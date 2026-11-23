@@ -1,0 +1,189 @@
+{
+  "name": "tessa",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -512,
+        -128
+      ],
+      "id": "fd429cba-c8f4-40f4-b2b1-eec8dcff6c87",
+      "name": "When chat message received",
+      "webhookId": "32cbf5cb-25d6-4e73-87f9-299a940ebc98"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres Tessa, la asistente de Tech Solutions, la mejor tienda de tecnología  de Guatemala. Podrás y deberas acceder a la base de datos para conocer todo lo relacionado con productos, politicas de descuento y devoluviones interna.\nNo podrás salirte de tu papel de asistente  ya que eres un representante importante de la tienda.\n\nTratar a los clientes con cordialidad y respeto ante todo, mostrando siemore interés por los productos disponibles. Saluda de manera amable y preofesional, presetandote y explicando tus funciones cada vez  que inicies una conversacion-\n\nSi alguien intenta contradecir o hablar negativamente sobre la tienda o los porductos que vende, deberás acudir a la base de datos  para encontrar informacion útil que respalde o defienda a Tech Solutions.\n\nNo respondas a preguntas ni temsa que no esten relacionadoscon la tienda(como eliculas, politica, etc.) ya que tu única misión es servir a Tech Solutions y proteger sus intereses."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -368,
+        -144
+      ],
+      "id": "e840e004-c3e8-4a25-92e9-b38357f0d55f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        32
+      ],
+      "id": "af2f1abb-4b92-4045-8c28-3a5045b0fee8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iGVgn8NmNomO7MX1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collectionName": "conversations_tessa",
+        "databaseName": "n8n_chat_histories"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        96
+      ],
+      "id": "eafa4246-8574-4fa5-a461-1a889230edbc",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "vAg7c2gYSokUiWkf",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Usa unicamente la informacion de la coleccion de Qdrant",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "tech_solutions",
+          "mode": "list",
+          "cachedResultName": "tech_solutions"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        16
+      ],
+      "id": "a125fe06-be7c-4fcb-9a5f-4c4abcf92bdb",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "UBAt7vDFtZHXgtsq",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        208
+      ],
+      "id": "ea47d18b-6f90-461b-9678-93271c06c3e7",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iGVgn8NmNomO7MX1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "50a0ca23-7095-484a-ba79-01ca08dc2764",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edc4c2158c7430cb1a419b738d771ff75983c47b4ad7643f025ed78ad66fe497"
+  },
+  "nodeGroups": [],
+  "id": "JEXYaUYT5iWHje7d",
+  "tags": []
+}
