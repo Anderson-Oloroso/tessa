@@ -1,0 +1,162 @@
+{
+  "name": "Pdfs a Qdrant",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "tech_solutions",
+          "mode": "list",
+          "cachedResultName": "tech_solutions"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "d520f2b9-18ea-4890-837d-7e905df55eea",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "UBAt7vDFtZHXgtsq",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Generador de Embeddings",
+        "formDescription": "Agrega aqui tu archivo para transformarlo en embeddings",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Archivo",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "29df5754-96d3-4be7-adde-d5a3fe51ba84",
+      "name": "On form submission",
+      "webhookId": "e950718e-1e9f-4b78-8fa9-88608314dd3c"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        160
+      ],
+      "id": "bbe3658f-073e-4124-94bd-28e936c6e6ea",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iGVgn8NmNomO7MX1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        208
+      ],
+      "id": "ff69dcac-fedf-4829-8677-a938701df5a0",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        128,
+        368
+      ],
+      "id": "85aa6215-fa31-4512-88d3-c41b8bec1232",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3dbebe13-946f-43dd-973e-bbae79fc8e76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edc4c2158c7430cb1a419b738d771ff75983c47b4ad7643f025ed78ad66fe497"
+  },
+  "nodeGroups": [],
+  "id": "eCgcilereA64vHCN",
+  "tags": []
+}
